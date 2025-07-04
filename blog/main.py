@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, status, Response, HTTPException
-from pydantic import BaseModel
+# from pydantic import BaseModel
 from . import schemas, models
 from . database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from typing import List
+from passlib.context import CryptContext
 
 app=FastAPI()
 
@@ -60,9 +61,12 @@ def show(id, response: Response, db:Session=Depends(get_db)):
         # return {'detail': f"Blog with id {id} is not found"}
     return blog
 
+pwd_cxt=CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 @app.post('/user')
 def create_user(request: schemas.User, db:Session=Depends(get_db)):
-    new_user=models.User(request)
+    hashedPassword=pwd_cxt.hash(request.password)
+    new_user=models.User(name=request.name, email=request.email, password=hashedPassword)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
