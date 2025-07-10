@@ -11,11 +11,11 @@ def root():
     return "Hello World"
 
 @app.get("/blog")
-def say_hello(limit):
+def say_hello1(limit):
     return f"{limit} of books"
 
 @app.get("/blog/{id}")
-def say_hello(id: int):
+def say_hello2(id: int):
     return {"message": id}
 
 
